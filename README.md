@@ -1,89 +1,85 @@
 # PC Optimizer — Claude Skill
 
-Windows 10/11 bilgisayarları **oyun** ve **yazılım geliştirme** için güvenli ve geri alınabilir şekilde hızlandıran bir [Claude Agent Skill](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview).
+A [Claude Agent Skill](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) that safely and reversibly speeds up Windows 10/11 PCs for **gaming** and **software development**, including AMD / NVIDIA / Intel GPU settings.
 
-*A Claude Agent Skill that safely and reversibly speeds up Windows 10/11 PCs for gaming and software development, including AMD / NVIDIA / Intel GPU settings. English summary below.*
+Claude replies in the user's language, so the skill works for users worldwide.
 
-## Ne yapar?
+## What it does
 
-1. **Teşhis (salt-okunur):** İşlemci, RAM (XMP açık mı), ekran kartı ve sürücü sürümü, monitör yenileme hızı, diskler, güç planı, Oyun Modu, Game DVR, başlangıç uygulamaları ve geliştirici araçlarını kontrol eder.
-2. **Kişiye özel plan:** Darboğazı bulur, sadece gerçekten işe yarayan ayarları önerir. Placebo "registry tweak"leri önermez.
-3. **Geri alınabilir betik:** `optimize.ps1` ayarları değiştirmeden önce yedek ve sistem geri yükleme noktası alır. `-Undo` ile tek komutta geri alınır, `-DryRun` ile önce ne yapacağını gösterir.
-4. **Ekran kartı rehberleri:** AMD Adrenalin, NVIDIA Control Panel ve Intel Arc için önerilen ayarlar.
-5. **Oyun ön ayarları:** Rekabetçi FPS oyunları (Valorant, CS2…) ve sinematik RPG'ler (Witcher 3, Cyberpunk…) için.
-6. **Geliştirici ortamı:** Dev Drive, WSL/Docker bellek sınırı, Git, VS Code ve paket önbellekleri.
-7. **Doğrulama:** `verify.ps1` her şeyin uygulandığını kontrol eder.
+1. **Diagnosis (read-only):** Checks CPU, RAM (is XMP/EXPO enabled?), GPU and driver version, monitor refresh rate, disks, power plan, Game Mode, Game DVR, startup apps and developer tools.
+2. **Tailored plan:** Finds the real bottleneck and recommends only settings that actually help. No placebo "registry tweaks".
+3. **Reversible script:** `optimize.ps1` backs up current settings and creates a system restore point before changing anything. `-Undo` reverts everything in one command; `-DryRun` shows what would change first.
+4. **GPU guides:** Recommended settings for AMD Adrenalin, NVIDIA Control Panel / NVIDIA App and Intel Arc.
+5. **Game presets:** For competitive shooters (Valorant, CS2…) and cinematic RPGs (The Witcher 3, Cyberpunk 2077…).
+6. **Developer environment:** Dev Drive, WSL/Docker memory limits, Git, VS Code and package caches.
+7. **Verification:** `verify.ps1` checks that everything was applied.
 
-## Güvenlik ilkeleri
+## Safety principles
 
-- Sistem ayarlarını Claude değil, **kullanıcı** uygular. Claude betiği hazırlar, komutu verir, sonucu kontrol eder.
-- Defender, UAC, Windows Update, güvenlik duvarı ve anti-cheat (Vanguard, EAC…) **asla** kapatılmaz.
-- Her değişiklik yedeklenir ve geri alınabilir.
+- The **user** applies system changes, not Claude. Claude prepares the script, gives the command and checks the result.
+- Defender, UAC, Windows Update, the firewall and anti-cheat (Vanguard, EAC, BattlEye…) are **never** disabled.
+- Every change is backed up and reversible.
 
-## Kurulum
+## Installation
 
-### Claude Code
+### Claude Code (global, available in every project)
 ```bash
 git clone https://github.com/emrullahayin/pc-optimizer-skill.git
 ```
-`pc-optimizer` klasörünü kişisel skill klasörüne kopyalayın:
+Copy the `pc-optimizer` folder into your personal skills folder:
 - Windows: `%USERPROFILE%\.claude\skills\pc-optimizer`
 - macOS/Linux: `~/.claude/skills/pc-optimizer`
 
 ### Claude.ai / Claude Desktop
-`pc-optimizer` klasörünü zip'leyip **Settings → Capabilities → Skills → Upload skill** ile yükleyin.
+Zip the `pc-optimizer` folder and upload it via **Settings → Capabilities → Skills → Upload skill**.
 
-## Kullanım
+## Usage
 
-Claude'a şöyle yazmanız yeterli:
-- "Bilgisayarımı oyun için hızlandır"
-- "Valorant'ta FPS'im düşük, ne yapabilirim?"
-- "WSL ve npm install çok yavaş"
+Just ask Claude, for example:
+- "Speed up my PC for gaming"
+- "My FPS in Valorant is low, what can I do?"
+- "WSL and npm install are really slow"
 
-Betikleri elle de çalıştırabilirsiniz:
+You can also run the scripts manually:
 ```powershell
-# Teşhis (yönetici gerekmez)
+# Diagnose (no admin needed)
 powershell -ExecutionPolicy Bypass -File .\pc-optimizer\scripts\diagnose.ps1
 
-# Önizleme
+# Preview
 powershell -ExecutionPolicy Bypass -File .\pc-optimizer\scripts\optimize.ps1 -DryRun
 
-# Uygula (YÖNETİCİ terminal)
+# Apply (ADMINISTRATOR terminal)
 powershell -ExecutionPolicy Bypass -File .\pc-optimizer\scripts\optimize.ps1
 
-# Geri al
+# Undo
 powershell -ExecutionPolicy Bypass -File .\pc-optimizer\scripts\optimize.ps1 -Undo
 
-# Kontrol
+# Verify
 powershell -ExecutionPolicy Bypass -File .\pc-optimizer\scripts\verify.ps1
 ```
 
-Ek seçenekler: `-SkipVisualEffects`, `-SkipHibernate`, `-SkipCleanup`.
+Extra options: `-SkipVisualEffects`, `-SkipHibernate`, `-SkipCleanup`.
 
-Yedekler `Belgeler\PcOptimizerBackup` klasörüne kaydedilir. Not: Güç planında yapılan PCIe/USB alt ayarları `-Undo` ile sıfırlanmaz, ancak önceki plan geri etkinleştirilir.
+Backups are saved to `Documents\PcOptimizerBackup`. Note: the PCIe/USB power sub-settings are not reset by `-Undo`, but the previous power plan is re-activated.
 
-## Yapı
+## Structure
 
 ```
 pc-optimizer/
-├── SKILL.md              # Claude için talimatlar
+├── SKILL.md              # instructions for Claude
 ├── scripts/
-│   ├── diagnose.ps1      # salt-okunur teşhis
-│   ├── optimize.ps1      # yedekli, geri alınabilir ayarlar
-│   └── verify.ps1        # salt-okunur doğrulama
+│   ├── diagnose.ps1      # read-only diagnosis
+│   ├── optimize.ps1      # backed-up, reversible settings
+│   └── verify.ps1        # read-only verification
 └── references/
     ├── gpu-amd.md
     ├── gpu-nvidia.md
     ├── gpu-intel.md
     ├── games.md
     ├── dev.md
-    └── myths.md          # işe yaramayan / zararlı tweak'ler
+    └── myths.md          # tweaks that don't help or cause harm
 ```
 
-## English summary
+## License
 
-`pc-optimizer` teaches Claude to diagnose a Windows PC with read-only commands, explain a tailored plan, hand the user a reversible PowerShell script (backup, restore point, `-DryRun`, `-Undo`), give GPU-vendor-specific driver panel settings and per-game presets, tune developer environments (Dev Drive, WSL, Git, VS Code), and verify the result. It never disables security features or anti-cheat, and avoids placebo tweaks.
-
-## Lisans
-
-MIT — bkz. [LICENSE](LICENSE). Kullanım kendi sorumluluğunuzdadır.
+MIT — see [LICENSE](LICENSE). Use at your own risk.
