@@ -24,7 +24,7 @@ Windows 10/11 bilgisayarları **oyun** ve **yazılım geliştirme** için güven
 
 ### Claude Code
 ```bash
-git clone https://github.com/<kullanici-adi>/pc-optimizer-skill.git
+git clone https://github.com/emrullahayin/pc-optimizer-skill.git
 ```
 `pc-optimizer` klasörünü kişisel skill klasörüne kopyalayın:
 - Windows: `%USERPROFILE%\.claude\skills\pc-optimizer`
